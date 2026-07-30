@@ -668,9 +668,14 @@ function runSelfTest() {
   // Row C — matched via fuzzy Company+Role fallback (no tracker reference;
   // company spelled slightly differently ["Inc" suffix], role phrased
   // slightly differently but role-matcher.mjs's roleFuzzyMatch still agrees
-  // on 2+ discriminating tokens). Also doubles as a tier-1 case: the tracker
-  // still shows "Applied" but the live interview log implies Interview stage.
-  const rowC = { row: { Company: 'Fabrikam Health Inc', Role: 'HR Business Partner Support', Round: 'Prescreen', 'Date/Time': '2026-04-12', Interviewer: 'Recruiter', Status: 'Scheduled', Notes: 'clean process' }, lineNum: 22 };
+  // on 2+ discriminating tokens). Suffixed with "Team" rather than a content
+  // word: role-matcher.mjs now treats a non-baseline suffix as a
+  // specialization marker for a distinct sibling req (#2009/#2165), and
+  // "Team" is a ROLE_STOPWORD the tokenizer drops, so this stays a genuine
+  // phrasing-variant fixture instead of asserting a match roleFuzzyMatch no
+  // longer grants. Also doubles as a tier-1 case: the tracker still shows
+  // "Applied" but the live interview log implies Interview stage.
+  const rowC = { row: { Company: 'Fabrikam Health Inc', Role: 'HR Business Partner Team', Round: 'Prescreen', 'Date/Time': '2026-04-12', Interviewer: 'Recruiter', Status: 'Scheduled', Notes: 'clean process' }, lineNum: 22 };
 
   // Row D — unmatched/low-confidence: no tracker reference, and the company
   // name doesn't resemble anything in the fixture tracker.

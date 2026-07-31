@@ -797,7 +797,7 @@ These have no `npm run` binding — modes and agents call them with
 
 | Invocation | Purpose |
 |------------|---------|
-| `node set-status.mjs <report#\|company> <State> [--note]` | Canonical tracker write path: strict states.yml validation, shared lock, atomic write. Modes call this instead of hand-editing `applications.md` |
+| `node set-status.mjs <report#\|company\|--row N\|--report N> <State> [--note]` | Canonical tracker write path: strict states.yml validation, shared lock, atomic write. Modes call this instead of hand-editing `applications.md` (see [set-status](#set-status) for the selectors) |
 | `node followup-cadence.mjs [--summary]` | Follow-up cadence per active application; flags overdue entries |
 | `node followup-seed.mjs [--backfill]` | Seed `data/follow-ups.md` with a pinned first follow-up date when a row turns Applied |
 | `node reply-watch.mjs` | Classify employer replies from `data/reply-candidates.json`, match to tracker rows, print a review digest |
@@ -810,6 +810,33 @@ These have no `npm run` binding — modes and agents call them with
 | `node plugin-install.mjs` | Clone/scaffold/validate community plugins (allowlisted URLs, pinned SHA) |
 | `node plugin-audit.mjs` | Static safety scan for community/registry plugins |
 | `node validate-plugin-registry.mjs` | Shape gate for `plugins-registry/<id>.json` files |
+
+---
+
+## set-status
+
+Canonical write path for a tracker row's status and notes (#1428). Strict `templates/states.yml` validation, the shared tracker lock, atomic replace; only the Status and Notes cells of the matched row change.
+
+### Row selectors: `--row` vs `--report` (#2347)
+
+Tracker row IDs and report IDs are two independent counters sharing one number space, and they **diverge permanently** once any row exists without a report — `reserve-report-num.mjs` treats tracker row IDs as occupied when allocating a report number, so the sequences leapfrog and never realign. A bare number is therefore genuinely ambiguous on a mature tracker: "5" may mean tracker row #5 or report #5, which are different applications. `--row N` and `--report N` say which number space you mean.
+
+```bash
+node set-status.mjs --row 5 Applied        # tracker row #5, whatever report it links
+node set-status.mjs --report 5 Applied     # the row whose Report cell links report #5
+```
+
+On a diverged tracker those two commands write to two different companies. `--row` matches the `#` column; `--report` resolves through the Report cell and will **not** fall back to matching a report-less row by its tracker number.
+
+**They are mutually exclusive** (`--row 5 --report 5` exits 1 without writing), and each replaces the positional selector rather than narrowing it — passing both a selector flag and a positional company is also rejected.
+
+**`--row` and `--report` skip the report-link mismatch guard without needing `--force`**, and the distinction matters: they *answer* the ambiguity, while `--force` *suppresses* the check while the ambiguity is still real. On a diverged tracker the guard fires on nearly every bare numeric call, and a guard that always fires trains callers to reach for `--force`, which disables it everywhere including the cases it was written for. Prefer an explicit selector (or the company name) over a bare number, and prefer any of them over `--force`.
+
+A bare number is still enough whenever the tracker's counters have not diverged, or when the row's own report link agrees with its `#`. When they disagree, the guard names both options in its error, so the fix is a copy-paste.
+
+**Exit codes:** `0` success (including no-op re-runs) · `1` usage error — a conflicting or non-numeric selector, or a non-canonical state · `2` row not found (no such tracker `#`, or no row links that report) · `3` ambiguous — a company matching several rows, or a bare number the mismatch guard rejected · `4` tracker lock timeout, retry later. Nothing is written on any non-zero exit.
+
+To identify a row before writing to it, [find](#find) resolves a number, company, or role fragment to its full identity and reports collisions between the two numbering schemes.
 
 ---
 

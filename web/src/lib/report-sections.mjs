@@ -16,14 +16,20 @@
  * block added past H is handled the day the core writes it.
  */
 
-/** Single source of truth for what an author-letter prefix looks like. */
-const AUTHOR_LETTER = "(?:Block\\s+)?([A-Z])";
-
 /** Strips the prefix for display: needs a real delimiter, never a bare space. */
-const HEADING_PREFIX = new RegExp(`^\\s*${AUTHOR_LETTER}[).:]\\s*`, "i");
+const HEADING_PREFIX = /^\s*(?:Block\s+)?([A-Z])[).:]\s*/i;
 
-/** Reads the letter: also accepts "Block A Role Summary" (spelled-out form). */
-const HEADING_LETTER = new RegExp(`^${AUTHOR_LETTER}[).:\\s]`, "i");
+/**
+ * Reads the letter. A bare letter needs a delimiter, exactly like the display
+ * form above — otherwise "A Recommendation Was Requested" is read as section A
+ * and ReportView expands ordinary prose as if it were Block A.
+ *
+ * The whitespace form is kept for the spelled-out grammar only: oferta.md
+ * writes "## Block A — Role Summary", where nothing follows the letter but a
+ * space. Requiring a delimiter there would lose the F verdict callout and the
+ * A/B expansion on those reports.
+ */
+const HEADING_LETTER = /^(?:Block\s+([A-Z])(?:[).:]|\s)|([A-Z])[).:])/i;
 
 /**
  * @typedef {{ heading: string, letter: string | null, content: string }} Section
@@ -50,7 +56,8 @@ export function cleanHeading(h) {
  * @returns {string | null}
  */
 export function authorLetter(heading) {
-  return heading.match(HEADING_LETTER)?.[1]?.toUpperCase() ?? null;
+  const match = heading.match(HEADING_LETTER);
+  return (match?.[1] ?? match?.[2])?.toUpperCase() ?? null;
 }
 
 /**

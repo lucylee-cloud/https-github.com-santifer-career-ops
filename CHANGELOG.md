@@ -1,5 +1,32 @@
 # Changelog
 
+## [1.25.0](https://github.com/santifer/career-ops/compare/career-ops-v1.24.0...career-ops-v1.25.0) (2026-08-02)
+
+
+### Features
+
+* add company:funded — review-first funded-company discovery from public RSS sources ([#2117](https://github.com/santifer/career-ops/issues/2117)) ([7ab92ab](https://github.com/santifer/career-ops/commit/7ab92abb139ccd0e8712d62b2fff4211c551fd33))
+* **i18n:** add Italian translations for interview modes ([#2335](https://github.com/santifer/career-ops/issues/2335)) ([8127c93](https://github.com/santifer/career-ops/commit/8127c932f0c14200e7e519495ce52d033ab3a3f6))
+* **test:** dynamic upgrade PR gate — old install applies the commit under test ([#2358](https://github.com/santifer/career-ops/issues/2358)) ([aa57dcb](https://github.com/santifer/career-ops/commit/aa57dcb1803a8a8ae41f60f587308738f9626e3a))
+* **web:** Follow-up Tracker page with logging, history, and cadence settings ([#1422](https://github.com/santifer/career-ops/issues/1422)) ([6554de6](https://github.com/santifer/career-ops/commit/6554de6dcd28b95556e95ae220aebc719cc7a2a0))
+* **weekly-digest:** weekly interview digest aggregator ([#2130](https://github.com/santifer/career-ops/issues/2130)) ([37a5184](https://github.com/santifer/career-ops/commit/37a5184ba0bbcb590f5e17cfbf6a718db1527460))
+
+
+### Bug Fixes
+
+* **company-funded:** the cuts N% layoff exclusion never matched ([#2404](https://github.com/santifer/career-ops/issues/2404)) ([476b21b](https://github.com/santifer/career-ops/commit/476b21be740ee2399a5c0209641c91a4c8d6bd41))
+* **company-history:** count a hire as a company response ([#2297](https://github.com/santifer/career-ops/issues/2297)) ([c6220bf](https://github.com/santifer/career-ops/commit/c6220bf1e414b37e9fb0aec6bc6e68c47189b94b))
+* **dashboard:** localize the hired status label and buffer split stream openers ([#2295](https://github.com/santifer/career-ops/issues/2295)) ([8f5d10d](https://github.com/santifer/career-ops/commit/8f5d10d6aa97438a4ac3908814456df5a8cf4083))
+* **dashboard:** the progress funnel dropped Hired from every stage ([#2406](https://github.com/santifer/career-ops/issues/2406)) ([aac93e8](https://github.com/santifer/career-ops/commit/aac93e82809a345430c6e7fe89263cfb6aa86416))
+* **jd-skill-gap:** warn when zero skills are classified instead of printing a clean summary ([#2341](https://github.com/santifer/career-ops/issues/2341)) ([9e3586d](https://github.com/santifer/career-ops/commit/9e3586da3e4a54291e2ddab07e218e09cbd76b92))
+* **set-status:** close the report-less-row blind spot and add explicit --row/--report selectors ([#2347](https://github.com/santifer/career-ops/issues/2347)) ([292f55d](https://github.com/santifer/career-ops/commit/292f55d49dc10deaa6e96975634b650143eb08e4))
+* show actual LinkedIn URL as cover-letter link text, not the word "LinkedIn" ([#2338](https://github.com/santifer/career-ops/issues/2338)) ([f04b40e](https://github.com/santifer/career-ops/commit/f04b40e1d1bfbad4a329d2fcc8c24251a8285553))
+* strip GitHub URL scheme case-insensitively in cover letters ([#2340](https://github.com/santifer/career-ops/issues/2340)) ([0157284](https://github.com/santifer/career-ops/commit/0157284500925b7042707184e547a862da0406fe))
+* **test-all:** the states.yml freeze guarded 6 of 9 ids ([#2408](https://github.com/santifer/career-ops/issues/2408)) ([d3acdad](https://github.com/santifer/career-ops/commit/d3acdad1d9db5a053a6be436905efa8c5a12d9a9))
+* **tests:** budget harness waits for slow runners and preserve crashed-script diagnostics ([#2332](https://github.com/santifer/career-ops/issues/2332)) ([e439792](https://github.com/santifer/career-ops/commit/e439792bc58740f83fb153807f02929f500f0759))
+* **web:** render PDFs from the backend instead of the spawned agent ([#2182](https://github.com/santifer/career-ops/issues/2182)) ([fef3ff2](https://github.com/santifer/career-ops/commit/fef3ff2e228cc14e55df4ced958e4b0aa630ec65))
+* **weekly-digest:** --from=… was silently ignored, digesting the wrong week ([#2402](https://github.com/santifer/career-ops/issues/2402)) ([43af8c6](https://github.com/santifer/career-ops/commit/43af8c64b29d5110b679f0d5accfb7532baee508))
+
 ## [1.24.0](https://github.com/santifer/career-ops/compare/career-ops-v1.23.0...career-ops-v1.24.0) (2026-07-30)
 
 

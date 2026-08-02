@@ -317,6 +317,7 @@ const SYSTEM_PATHS = [
   'test/cover-resolver.test.mjs',
   'test/pipeline-lock.test.mjs',
   'test/profile-photo.test.mjs',
+  'test/job-error-hint.test.mjs',
   'templates/cv-template.zh-minimal.html',
   'test/zh-minimal-template.test.mjs',
   'scaffolder/',

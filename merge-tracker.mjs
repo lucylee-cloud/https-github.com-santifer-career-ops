@@ -725,26 +725,44 @@ for (const file of tsvFiles) {
     const newScore = parseScore(addition.score);
     const oldScore = parseScore(duplicate.score);
 
-    if (newScore > oldScore) {
-      console.log(`🔄 Update: #${duplicate.num} ${addition.company} — ${addition.role} (${oldScore}→${newScore})`);
-      const lineIdx = appLines.indexOf(duplicate.raw);
-      if (lineIdx >= 0) {
-        const pdf = reportNum && pdfIndex.has(String(reportNum)) ? '✅' : duplicate.pdf;
-        const updatedLine = buildRow({
-          num: duplicate.num, date: addition.date, company: addition.company,
-          role: reportNumMatched ? addition.role : duplicate.role,
-          via: addition.via || duplicate.via || '—',
-          location: addition.location || duplicate.location || '—',
-          score: addition.score, status: duplicate.status, pdf,
-          report: addition.report,
-          notes: `Re-eval ${addition.date} (${oldScore}→${newScore}). ${addition.notes}`,
-        });
-        appLines[lineIdx] = updatedLine;
-        updated++;
-      }
-    } else {
-      console.log(`⏭️  Skip: ${addition.company} — ${addition.role} (existing #${duplicate.num} ${oldScore} >= new ${newScore})`);
-      skipped++;
+    // A re-evaluation writes through in BOTH directions. A lower score is not
+    // noise to discard — it is newer information, and often the most valuable
+    // kind: a targeting/policy change, a freshly-discovered staleness signal
+    // (a requisition turning out to be a year old), or a gap re-weighted from
+    // "ramp-up item" to "decisive gate". The former `newScore > oldScore` gate
+    // sent all of those to a bare `else`, so the tracker kept asserting a stale
+    // optimistic score, the new report was orphaned, and the TSV was archived
+    // to merged/ as if it had landed. Equal scores write through too, since the
+    // notes and report link are still fresher than what the row holds.
+    //
+    // Because the fuzzy matcher can mis-pair genuinely different roles (see
+    // role-matcher.mjs — "Senior" is a stopword and short tokens are dropped),
+    // a downgrade records the superseded report number in Notes so a bad match
+    // stays recoverable from the tracker alone.
+    const downgrade = newScore < oldScore;
+    const oldReportNum = extractReportNum(duplicate.report);
+    const supersededNote = downgrade && oldReportNum && oldReportNum !== reportNum
+      ? ` Superseded report [${oldReportNum}] (was ${oldScore}/5).`
+      : '';
+
+    console.log(
+      `${downgrade ? '🔽' : '🔄'} Update: #${duplicate.num} ${addition.company} — ${addition.role} (${oldScore}→${newScore})`
+      + (downgrade ? ' — DOWNGRADE, re-eval scored lower' : '')
+    );
+    const lineIdx = appLines.indexOf(duplicate.raw);
+    if (lineIdx >= 0) {
+      const pdf = reportNum && pdfIndex.has(String(reportNum)) ? '✅' : duplicate.pdf;
+      const updatedLine = buildRow({
+        num: duplicate.num, date: addition.date, company: addition.company,
+        role: reportNumMatched ? addition.role : duplicate.role,
+        via: addition.via || duplicate.via || '—',
+        location: addition.location || duplicate.location || '—',
+        score: addition.score, status: duplicate.status, pdf,
+        report: addition.report,
+        notes: `Re-eval ${addition.date} (${oldScore}→${newScore}).${supersededNote} ${addition.notes}`,
+      });
+      appLines[lineIdx] = updatedLine;
+      updated++;
     }
   } else {
     // New entry - preserve the TSV's reserved ID whenever it is actually
